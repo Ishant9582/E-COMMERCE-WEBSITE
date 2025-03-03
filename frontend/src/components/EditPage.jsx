@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateMenuItem, fetchMenu } from "../redux/menuSlice";
 import { useNavigate, useParams } from "react-router-dom";
+import { updateCart } from "../redux/cartSlice";
 
 const EditPage = () => {
   const { id } = useParams();
@@ -9,6 +10,8 @@ const EditPage = () => {
   const dispatch = useDispatch();
   
   const { items } = useSelector((state) => state.menu);
+  const { items: cartItems } = useSelector((state) => state.cart); // Get cart items
+
   const itemToEdit = items.find(item => item._id === id);
   
   const [editItem, setEditItem] = useState({ name: "", category: "", price: "", image: null });
@@ -33,6 +36,13 @@ const EditPage = () => {
 
     await dispatch(updateMenuItem({ id, updatedItem: formData }));
     dispatch(fetchMenu());
+
+    // Check if the item exists in the cart and update it
+    const existingCartItem = cartItems.find(item => item._id === id);
+    if (existingCartItem) {
+      dispatch(updateCart({ _id: id, name: editItem.name, category: editItem.category, price: editItem.price }));
+    }
+
     navigate("/menu");
   };
 

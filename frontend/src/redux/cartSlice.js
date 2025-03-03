@@ -21,9 +21,19 @@ const cartSlice = createSlice({
           state.items = state.items.filter(item => item._id !== action.payload);
         }
       }
+    },
+    removeAllFromCart: (state, action) => {
+      state.items = state.items.filter(item => item._id !== action.payload);
+    },
+    updateCart: (state, action) => {
+      const { _id, ...updatedDetails } = action.payload;
+      const existingItem = state.items.find(item => item._id === _id);
+      if (existingItem) {
+        Object.assign(existingItem, updatedDetails); // Update item details, keeping quantity the same
+      }
     }
   }
 });
 
-export const { addToCart, removeFromCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, removeAllFromCart, updateCart } = cartSlice.actions;
 export default cartSlice.reducer;
