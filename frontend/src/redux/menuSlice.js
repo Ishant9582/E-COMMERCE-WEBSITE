@@ -17,7 +17,6 @@ export const addMenuItem = createAsyncThunk("menu/addMenuItem", async (item) => 
 });
 
 export const updateMenuItem = createAsyncThunk("menu/updateMenuItem", async ({ id, updatedItem }) => {
-
   const response = await api.put(`/menu/${id}`, updatedItem, {
     headers: { "Content-Type": "application/json" }, // Ensure JSON format
   }) ;

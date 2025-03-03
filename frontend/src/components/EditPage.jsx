@@ -8,12 +8,12 @@ const EditPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const { items } = useSelector((state) => state.menu);
   const { items: cartItems } = useSelector((state) => state.cart); // Get cart items
 
   const itemToEdit = items.find(item => item._id === id);
-  
+
   const [editItem, setEditItem] = useState({ name: "", category: "", price: "", image: null });
 
   useEffect(() => {

@@ -47,6 +47,7 @@ exports.addMenuItem = async (req, res) => {
 exports.updateMenuItem = async (req, res) => {
   const { id } = req.params;
   const { name, category, price, availability } = req.body;
+  console.log(req.body);
   const imageUrl = req.file?.name;  // Handle image file if present
   console.log(imageUrl) ;
   if (!name || !category || !price) {
