@@ -47,33 +47,41 @@ exports.addMenuItem = async (req, res) => {
 exports.updateMenuItem = async (req, res) => {
   const { id } = req.params;
   const { name, category, price, availability } = req.body;
-  console.log(req.body);
-  const imageUrl = req.file?.name;  // Handle image file if present
-  console.log(imageUrl) ;
+  
   if (!name || !category || !price) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
-  try {
-    const updatedMenu = await Menu.findByIdAndUpdate(
-      id,
-      {
-        name,
-        category,
-        price,
-        availability: availability ?? true,
-        imageUrl,  // Update imageUrl only if a new image is uploaded
-      },
-      { new: true }
-    );
+  let imageUrl;
+  console.log(req.file) ;
+  if (req.file) {
+    imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+  }
 
-    if (!updatedMenu) return res.status(404).json({ message: 'Menu item not found' });
+  try {
+    const updatedFields = {
+      name,
+      category,
+      price,
+      availability: availability ?? true,
+    };
+
+    if (imageUrl) {
+      updatedFields.imageUrl = imageUrl;  // Only update if new image is uploaded
+    }
+
+    const updatedMenu = await Menu.findByIdAndUpdate(id, updatedFields, { new: true });
+
+    if (!updatedMenu) {
+      return res.status(404).json({ message: 'Menu item not found' });
+    }
 
     res.json(updatedMenu);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+
 
 // Delete a menu item
 exports.deleteMenuItem = async (req, res) => {

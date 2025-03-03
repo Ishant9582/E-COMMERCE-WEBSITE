@@ -11,15 +11,16 @@ export const fetchMenu = createAsyncThunk("menu/fetchMenu", async () => {
 
 // Add a new menu item
 export const addMenuItem = createAsyncThunk("menu/addMenuItem", async (item) => {
+  console.log(Object.fromEntries(item.entries()));
   const response = await api.post("/menu", item);
   
   return response.data;
 });
 
 export const updateMenuItem = createAsyncThunk("menu/updateMenuItem", async ({ id, updatedItem }) => {
-  const response = await api.put(`/menu/${id}`, updatedItem, {
-    headers: { "Content-Type": "application/json" }, // Ensure JSON format
-  }) ;
+  console.log(Object.fromEntries(updatedItem.entries()));
+  const response = await api.put(`/menu/${id}`, updatedItem // Ensure JSON format
+  ) ;
   return response.data;
 });
 
