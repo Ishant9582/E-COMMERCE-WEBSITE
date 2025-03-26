@@ -3,11 +3,10 @@ import api from "../utils/api";
 
 // Login user and store user data in localStorage
 export const loginUser = createAsyncThunk("users/login", async (credentials) => {
+  console.log
   const response = await api.post("http://localhost:3000/api/users/login", credentials);
   localStorage.setItem("token", response.data.token);
   localStorage.setItem("user", JSON.stringify(response.data.user)); // Store user in localStorage
-  console.log(response) ;
-  console.log(response.data) ;
   return response.data.user;
 });
 
