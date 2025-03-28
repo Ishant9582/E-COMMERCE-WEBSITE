@@ -1,153 +1,146 @@
-import React, { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
+import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
-const socket = io('http://localhost:3000');
+const socket = io("http://localhost:3000");
 
 const Chat = () => {
-  const [username, setUsername] = useState('');
-  const [message, setMessage] = useState('');
+  const user = useSelector((state) => state.auth.user);
   const [messages, setMessages] = useState([]);
-  const [editingMessageId, setEditingMessageId] = useState(null);
-  const [editedMessage, setEditedMessage] = useState('');
+  const [message, setMessage] = useState("");
 
-  // Load existing messages and listen for new ones
   useEffect(() => {
-    socket.on('load_messages', (loadedMessages) => {
-      setMessages(loadedMessages);
+    axios
+      .get("http://localhost:3000/api/messages")
+      .then((res) => {
+        setMessages(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch((err) => {
+        console.error("Error fetching messages:", err);
+        setMessages([]);
+      });
+
+    socket.on("receiveMessage", (newMessage) => {
+      setMessages((prev) => [...prev, newMessage]);
     });
 
-    socket.on('receive_message', (data) => {
-      setMessages((prev) => [...prev, data]);
-    });
-
-    socket.on('message_updated', ({ id, newMessage }) => {
-      setMessages((prev) =>
-        prev.map((msg) => (msg.id === id ? { ...msg, message: newMessage } : msg))
-      );
-    });
-
-    socket.on('message_deleted', (id) => {
-      setMessages((prev) => prev.filter((msg) => msg.id !== id));
-    });
-
-    return () => {
-      socket.off('load_messages');
-      socket.off('receive_message');
-      socket.off('message_updated');
-      socket.off('message_deleted');
-    };
+    return () => socket.off("receiveMessage");
   }, []);
 
-  // Send a new message
-  const sendMessage = () => {
-    if (message && username) {
-      const messageData = {
-        username,
-        message,
-        time: new Date().toLocaleTimeString(),
-      };
-      socket.emit('send_message', messageData);
-      setMessage('');
+  const sendMessage = async () => {
+    if (!message.trim() || !user?.username) return;
+
+    try {
+      const newMessage = { username: user.username, message };
+
+      const res = await axios.post(
+        "http://localhost:3000/api/messages",
+        newMessage,
+        {
+          headers: { Authorization: localStorage.getItem("token") },
+        }
+      );
+
+      socket.emit("sendMessage", res.data);
+      setMessage("");
+    } catch (err) {
+      console.error("Error sending message:", err);
     }
   };
 
-  // Start editing a message
-  const startEditing = (id, currentMessage) => {
-    setEditingMessageId(id);
-    setEditedMessage(currentMessage);
-  };
-
-  // Save edited message
-  const saveEditedMessage = (id) => {
-    if (editedMessage.trim()) {
-      socket.emit('update_message', { id, newMessage: editedMessage });
-      setEditingMessageId(null);
-      setEditedMessage('');
+  const editMessage = async (id, newText) => {
+    try {
+      console.log(id) ;
+      console.log(newText) ;
+      await axios.put(
+        `http://localhost:3000/api/messages/${id}`,
+        { username: user.username, message: newText },
+        {
+          headers: { Authorization: localStorage.getItem("token") },
+        }
+      );
+      setMessages((prev) =>
+        prev.map((msg) => (msg._id === id ? { ...msg, message: newText } : msg))
+      );
+    } catch (err) {
+      console.error("Error editing message:", err);
     }
   };
 
-  // Delete a message
-  const deleteMessage = (id) => {
-    socket.emit('delete_message', id);
+  const deleteMessage = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/messages/${id}`, {
+        headers: { Authorization: localStorage.getItem("token") },
+      });
+      setMessages((prev) => prev.filter((msg) => msg._id !== id));
+    } catch (err) {
+      console.error("Error deleting message:", err);
+    }
   };
-  console.log(messages) ;
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-4">💬 Real-Time Chat App</h1>
-
-      {/* Username Input */}
-      <input
-        type="text"
-        placeholder="Enter your username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        className="p-2 border rounded mb-4 w-64"
-      />
-
-      {/* Message Input */}
-      <div className="flex">
-        <input
-          type="text"
-          placeholder="Type your message..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          className="p-2 border rounded-l w-64"
-          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-        />
-        <button
-          onClick={sendMessage}
-          className="p-2 bg-blue-500 text-white rounded-r"
-        >
-          Send
-        </button>
+    <div className="flex flex-col max-w-lg mx-auto bg-gray-100 shadow-lg rounded-lg p-4 h-[80vh]">
+      <div className="text-xl font-semibold text-center text-white bg-blue-500 py-2 rounded-lg">
+        Chat Room
       </div>
 
-      {/* Chat Messages */}
-      <div className="mt-6 w-80 h-64 bg-white border rounded overflow-y-auto p-2">
-        {messages.map((msg) => (
-          <div key={msg._id} className="mb-2 flex justify-between items-center">
-            {editingMessageId === msg._id ? (
-              <>
-                <input
-                  type="text"
-                  value={editedMessage}
-                  onChange={(e) => setEditedMessage(e.target.value)}
-                  className="border p-1 rounded mr-2"
-                />
-                <button
-                  onClick={() => saveEditedMessage(msg.id)}
-                  className="bg-green-500 text-white px-2 rounded"
-                >
-                  Save
-                </button>
-              </>
-            ) : (
-              <>
-                <div>
-                  {/* {console.log(msg)}
-                  {console.log(msg._id)} */}
-                  <strong>{msg.username}</strong> [{msg.time}]: {msg.message}
-                </div>
-                {msg.username === username && (
-                  <div className="ml-2">
+      <div className="flex-1 overflow-y-auto p-2 space-y-2 bg-white rounded-lg mt-2">
+        {messages.length === 0 ? (
+          <p className="text-gray-500 text-center">No messages yet. Start the conversation!</p>
+        ) : (
+          messages.map((msg) => (
+            <div
+              key={msg._id}
+              className={`flex ${
+                msg.username === user.username ? "justify-end" : "justify-start"
+              }`}
+            >
+              <div
+                className={`p-2 rounded-lg text-white max-w-xs break-words ${
+                  msg.username === user.username ? "bg-blue-500" : "bg-gray-400"
+                }`}
+              >
+                <b>{msg.username}:</b> {msg.message}
+                {msg.username === user.username && (
+                  <div className="flex justify-end space-x-2 mt-1">
                     <button
-                      onClick={() => startEditing(msg._id, msg.message)}
-                      className="text-yellow-500 mr-2"
+                      onClick={() => {
+                        const newText = prompt("New Message", msg.message);
+                        if (newText) editMessage(msg._id, newText);
+                      }}
+                      className="text-sm text-white bg-green-500 px-2 py-1 rounded hover:bg-green-600"
                     >
-                      Edit
+                      ✏️
                     </button>
                     <button
                       onClick={() => deleteMessage(msg._id)}
-                      className="text-red-500"
+                      className="text-sm text-white bg-red-500 px-2 py-1 rounded hover:bg-red-600"
                     >
-                      Delete
+                      🗑️
                     </button>
                   </div>
                 )}
-              </>
-            )}
-          </div>
-        ))}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      <div className="flex mt-2">
+        <input
+          type="text"
+          placeholder="Type a message..."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          className="flex-1 border border-gray-300 rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          onClick={sendMessage}
+          className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600"
+        >
+          Send
+        </button>
       </div>
     </div>
   );

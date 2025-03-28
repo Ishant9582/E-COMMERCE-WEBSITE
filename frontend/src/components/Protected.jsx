@@ -7,7 +7,7 @@ export default function Protected({ children }) {
     const location = useLocation();
 
     // Fetch user details from Redux store
-    const user = useSelector(state => state.auth.user);
+    const user = useSelector(state => state.auth.user) ;
 
     // Redirect unauthenticated users
     useEffect(() => {

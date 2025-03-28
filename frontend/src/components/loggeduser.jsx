@@ -10,9 +10,9 @@ const User = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
 
-  useEffect(() => {
-    dispatch(fetchMenu());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchMenu());
+  // }, [dispatch]);
 
   const handleLogout = () => {
     dispatch(logout());
