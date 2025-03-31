@@ -10,9 +10,11 @@ import LoggedUser from "./components/LoggedUser";
 import AddUser from "./components/addnew";
 import AuthLayout from "./components/authlayout";
 import Chat from "./components/Chat";
+import Header from "./components/header"
 function App() {
   return (
     <div className="min-h-screen bg-gray-100">
+      <Header></Header>
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
