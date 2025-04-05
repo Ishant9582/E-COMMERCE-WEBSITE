@@ -1,11 +1,14 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch} from "react-redux";
 import { Link } from "react-router-dom";
 import { placeOrder } from "../redux/orderSlice";
+import Product from "./payment.jsx";
+import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
   const cart = useSelector((state) => state.cart.items);
   const user = useSelector((state) => state.auth.user);
+  const navigate = useNavigate() ;
   const dispatch = useDispatch();
 
   // Handle Place Order button click
@@ -84,7 +87,8 @@ const CartPage = () => {
           onClick={handlePlaceOrder}
           className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300"
         >
-          Place Order
+          <Product/>
+          {navigate("/orders")} ;
         </button>
       </div>
     </div>

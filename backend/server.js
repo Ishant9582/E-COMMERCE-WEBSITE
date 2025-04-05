@@ -10,7 +10,7 @@ const userRoutes = require('./routes/userRoutes');
 const menuRoutes = require('./routes/menuRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const messageRoutes = require('./routes/messageRoutes');
-
+const paymentRoutes = require('./routes/paymentRoutes');
 dotenv.config();
 
 const app = express();
@@ -37,6 +37,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/', paymentRoutes);
 
 // Socket.io Setup for Real-time Chat
 const io = new Server(server, {
