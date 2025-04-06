@@ -1,17 +1,19 @@
-export default function product() {
+import { useNavigate } from "react-router-dom";
+export default function product({totalPrice , order_id}) {
+    console.log("Total Price:", totalPrice); // Log the total price for debugging
+    const navigate = useNavigate() ;
     const paymenthandler = async (e) => {
-        const amount = 500; // Example amount in smallest currency unit
-        const currency = "INR"; // Example currency
+        const amount = totalPrice * 100 ; // Convert the amount to the smallest currency unit (e.g., 30 becomes 3000)
+        const currency = "INR"; //Example currency
         const receiptId = "receipt123"; // Example receipt ID
-
         const response = await fetch("http://localhost:3000/orders", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                amount,
-                currency,
+                amount ,
+                currency ,
                 receipt: receiptId,
                 payment_capture: 1,
             }),
@@ -69,6 +71,8 @@ export default function product() {
         });
         rzp1.open();
         e.preventDefault();
+        navigate("/orders"); // Redirect to the orders page after payment
+
     };
 
 

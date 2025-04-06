@@ -34,6 +34,9 @@ const CartPage = () => {
     dispatch(placeOrder(orderData));  // Dispatch the order with userId
   };
 
+  const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  console.log("Total Price:", totalPrice); // Log the total price for debugging
+
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Your Cart</h1>
@@ -87,8 +90,7 @@ const CartPage = () => {
           onClick={handlePlaceOrder}
           className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300"
         >
-          <Product/>
-          {navigate("/orders")} ;
+          <Product totalPrice={totalPrice} />
         </button>
       </div>
     </div>
