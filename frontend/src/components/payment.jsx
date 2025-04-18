@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
-export default function product({totalPrice , order_id}) {
+export default function product({totalPrice , receiptId}) {
     console.log("Total Price:", totalPrice); // Log the total price for debugging
     const navigate = useNavigate() ;
     const paymenthandler = async (e) => {
         const amount = totalPrice * 100 ; // Convert the amount to the smallest currency unit (e.g., 30 becomes 3000)
         const currency = "INR"; //Example currency
-        const receiptId = "receipt123"; // Example receipt ID
+        const receiptId = receiptId; // Example receipt ID
         const response = await fetch("http://localhost:3000/orders", {
             method: "POST",
             headers: {

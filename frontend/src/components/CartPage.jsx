@@ -10,6 +10,7 @@ const CartPage = () => {
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate() ;
   const dispatch = useDispatch();
+  const receiptId = uuidv4(); // Generate a unique receipt ID
 
   // Handle Place Order button click
   const handlePlaceOrder = () => {
@@ -90,7 +91,8 @@ const CartPage = () => {
           onClick={handlePlaceOrder}
           className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 transition duration-300"
         >
-          <Product totalPrice={totalPrice} />
+          <Product totalPrice={totalPrice} receiptId={receiptId} />
+          {/* Pass the total price to the Product component */}
         </button>
       </div>
     </div>

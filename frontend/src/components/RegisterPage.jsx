@@ -8,10 +8,10 @@ const RegisterPage = () => {
   const { register, handleSubmit } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const onSubmit = async (data) => {
     const result = await dispatch(registerUser(data));
     if (result.payload) navigate("/menu");
+    // If the `result.payload` exists (i.e., it's truthy), navigate the user to the "/menu" route.
   };
 
   return (

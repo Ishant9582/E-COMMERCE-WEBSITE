@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchMenu, addMenuItem, deleteMenuItem } from "../redux/menuSlice";
-import { addToCart, removeFromCart } from "../redux/cartSlice";
 import { logout } from "../redux/authSlice";
 import { useNavigate } from "react-router-dom";
 

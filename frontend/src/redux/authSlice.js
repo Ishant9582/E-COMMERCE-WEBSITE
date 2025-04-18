@@ -2,6 +2,15 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../utils/api";
 
 // Login user and store user data in localStorage
+
+// What is createAsyncThunk doing?
+// When you use createAsyncThunk, it automatically creates 3 types of actions for any async function:
+
+// pending – when the request starts
+
+// fulfilled – when the request is successful
+
+// rejected – when the request fails
 export const loginUser = createAsyncThunk("users/login", async (credentials) => {
   console.log
   const response = await api.post("http://localhost:3000/api/users/login", credentials);
