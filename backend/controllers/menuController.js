@@ -7,7 +7,7 @@ exports.getMenu = async (req, res) => {
     //console.log(menu) ;
     res.json(menu);
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    res.status(500).json({ message: 'Server error cant able to find menu', error: err.message });
   }
 };
 
@@ -24,9 +24,8 @@ exports.addMenuItem = async (req, res) => {
   console.log(imageUrl);
 
   if (!name || !category || !price) {
-    return res.status(400).json({ message: 'All fields are required' });
+    return res.status(400).json({message: 'All fields are required for menu'});
   }
-
   try {
     const menuItem = await Menu.create({
       name,
@@ -35,7 +34,6 @@ exports.addMenuItem = async (req, res) => {
       availability: availability ?? true,
       imageUrl,
     });
-
     res.status(201).json(menuItem);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -49,7 +47,7 @@ exports.updateMenuItem = async (req, res) => {
   const { name, category, price, availability } = req.body;
   
   if (!name || !category || !price) {
-    return res.status(400).json({ message: 'All fields are required' });
+    return res.status(400).json({ message: 'All fields are required for updating menu'});
   }
 
   let imageUrl;
@@ -94,4 +92,15 @@ exports.deleteMenuItem = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
+
+
+  //{
+//   data: { message: "Item deleted successfully" }, // 👈 this is what server sends if deleted successfully
+//   status: 200,
+//   statusText: "OK",
+//   headers: { ... },
+//   config: { ... },
+//   request: { ... }
+// }
+
 };

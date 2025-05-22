@@ -15,7 +15,7 @@ const User = () => {
   const handleLogout = () => {
     dispatch(logout());
     localStorage.removeItem("user");
-    navigate("/");
+    navigate("/login");
   };
   return (
     <div className="p-4">

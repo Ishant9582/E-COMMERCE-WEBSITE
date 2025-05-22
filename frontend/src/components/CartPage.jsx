@@ -4,12 +4,13 @@ import { Link } from "react-router-dom";
 import { placeOrder } from "../redux/orderSlice";
 import Product from "./payment.jsx";
 import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
 
 const CartPage = () => {
   const cart = useSelector((state) => state.cart.items);
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate() ;
-  const dispatch = useDispatch();
+  const dispatch = useDispatch() ;
   const receiptId = uuidv4(); // Generate a unique receipt ID
 
   // Handle Place Order button click
