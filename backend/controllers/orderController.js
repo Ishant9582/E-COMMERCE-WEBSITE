@@ -5,7 +5,7 @@ const Menu = require('../models/menuModel');    // Importing Menu model
 exports.placeOrder = async (req, res) => {
   const { items , status } = req.body;  // Extracting items from the request body
    // Logging the items to see what was sent
-
+  console.log(status);
   // Check if the items are valid
   if (!items || !Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ message: 'Order must contain items' });  // If no items, return an error
@@ -31,6 +31,7 @@ exports.placeOrder = async (req, res) => {
       userId: req.user._id,  // The ID of the user placing the order
       items,  // The items in the order
       totalAmount,  // The total cost of the order
+      status: status || 'Pending',  // The status of the order, defaulting to 'Pending'
     });
 
     // Return the created order with a success status

@@ -1,86 +1,117 @@
+import React from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { placeOrder } from "../redux/orderSlice";
 
-export default function Product({ totalPrice, receiptId }) {
-    const navigate = useNavigate();
+export default function Product({ totalPrice, receiptId, cart, user }) {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-    const paymenthandler = async (e) => {
-        e.preventDefault();
+  const paymenthandler = async (e) => {
+    e.preventDefault();
 
-        const amount = totalPrice * 100;
-        const currency = "INR";
-        console.log("Total Price:", totalPrice); // Log the total price for debugging
-        const response = await fetch("http://localhost:3000/orders", {
+    const amount = totalPrice * 100;
+    const currency = "INR";
+
+    const response = await fetch("http://localhost:3000/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount,
+        currency,
+        receipt: receiptId,
+        payment_capture: 1,
+      }),
+    });
+
+    const order = await response.json();
+
+    const options = {
+      key: "rzp_test_Wv0PgCtFcNlxHI",
+      amount,
+      currency,
+      name: "Acme Corp",
+      description: "Test Transaction",
+      image: "https://example.com/your_logo",
+      order_id: order.id,
+      handler: async function (response) {
+        try {
+          const validateRes = await fetch("http://localhost:3000/order/validate", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                amount,
-                currency,
-                receipt: receiptId,
-                payment_capture: 1,
-            }),
-        });
+            body: JSON.stringify(response),
+          });
 
-        const order = await response.json();
-        console.log(order);
+          const jsonRes = await validateRes.json();
+          const message = "Payment Successful";
+          dispatch(placeOrder({
+            items: cart.map(item => ({
+              menuItem: item._id,
+              quantity: item.quantity,
+            })),
+            status: message,
+          }));
 
-        var options = {
-            key: "rzp_test_Wv0PgCtFcNlxHI",
-            amount,
-            currency,
-            name: "Acme Corp",
-            description: "Test Transaction",
-            image: "https://example.com/your_logo",
-            order_id: order.id,
-            handler: async function (response) {
-                const validateRes = await fetch("http://localhost:3000/order/validate", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(response)
-                });
-                const jsonRes = await validateRes.json();
-                console.log(jsonRes);
-                alert("ding ding ding");
-                navigate("/orders");
-            },
-            prefill: {
-                name: "Oi",
-                email: "gaurav.kumar@example.com",
-                contact: "9315745437",
-            },
-            notes: {
-                address: "Razorpay Corporate Office"
-            },
-            theme: {
-                color: "#3399cc"
-            }
-        };
-
-        var rzp1 = new window.Razorpay(options);
-        rzp1.on('payment.failed', function (response) {
-            console.error("Payment failed:", {
-                code: response.error.code,
-                description: response.error.description,
-                source: response.error.source,
-                step: response.error.step,
-                reason: response.error.reason,
-                order_id: response.error.metadata.order_id,
-                payment_id: response.error.metadata.payment_id,
-            });
-            alert("Payment failed. Please try again.");
-            navigate("/orders");
-        });
-
-        rzp1.open();
-        
+          navigate("/orders");
+        } catch (err) {
+          alert("Something went wrong while validating payment.");
+          dispatch(placeOrder({
+            items: cart.map(item => ({
+              menuItem: item._id,
+              quantity: item.quantity,
+            })),
+            status: "Payment validation error",
+          }));
+          navigate("/orders");
+        }
+      },
+      prefill: {
+        name: "Oi",
+        email: "gaurav.kumar@example.com",
+        contact: "9315745437",
+      },
+      notes: {
+        address: "Razorpay Corporate Office",
+      },
+      theme: {
+        color: "#3399cc",
+      },
     };
 
-    return (
-        <div>
-            <button onClick={paymenthandler} type="button" className="btn btn-primary">Pay</button>
-        </div>
-    );
+    const rzp1 = new window.Razorpay(options);
+
+    rzp1.on("payment.failed", function (response) {
+      const message = "Payment Failed";
+
+      alert(message);
+
+      dispatch(placeOrder({
+        items: cart.map(item => ({
+          menuItem: item._id,
+          quantity: item.quantity,
+        })),
+        status: message,
+      }));
+
+      navigate("/orders");
+    });
+
+    rzp1.open();
+  };
+
+return (
+    <div className="flex justify-center mt-8">
+        <button
+            onClick={paymenthandler}
+            type="button"
+            className="px-8 py-3 text-lg rounded-full bg-gradient-to-r from-[#3399cc] to-[#66ccff] border-none shadow-lg text-white font-bold transition-all duration-300 hover:from-[#66ccff] hover:to-[#3399cc] focus:outline-none"
+        >
+            Pay Now
+        </button>
+    </div>
+);
 }

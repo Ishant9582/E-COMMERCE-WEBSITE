@@ -17,6 +17,7 @@ export const placeOrder = createAsyncThunk("order/placeOrder", async (orderData)
   const response = await api.post("/orders", orderData, {
     headers: { Authorization: `Bearer ${token}` },
   });
+  console.log(response.data) ;
   return response.data;
 });
 

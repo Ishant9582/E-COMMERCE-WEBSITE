@@ -68,7 +68,7 @@ const MenuPage = () => {
             <div className="text-center mt-2">
               <h2 className="text-lg font-semibold text-gray-800">{item.name}</h2>
               <p className="text-sm text-gray-500">{item.category}</p>
-              <p className="text-xl font-bold text-gray-900">${item.price.toFixed(2)}</p>
+              <p className="text-xl font-bold text-gray-900">Rs {item.price.toFixed(2)}</p>
               <button
                 onClick={() => handleDelete(item._id)}
                 className="text-red-500 text-sm mt-2 hover:underline"
