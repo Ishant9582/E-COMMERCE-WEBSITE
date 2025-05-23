@@ -8,7 +8,7 @@ export default function Product({ totalPrice, receiptId }) {
 
         const amount = totalPrice * 100;
         const currency = "INR";
-
+        console.log("Total Price:", totalPrice); // Log the total price for debugging
         const response = await fetch("http://localhost:3000/orders", {
             method: "POST",
             headers: {
@@ -44,6 +44,7 @@ export default function Product({ totalPrice, receiptId }) {
                 const jsonRes = await validateRes.json();
                 console.log(jsonRes);
                 alert("ding ding ding");
+                navigate("/orders");
             },
             prefill: {
                 name: "Oi",
@@ -70,10 +71,11 @@ export default function Product({ totalPrice, receiptId }) {
                 payment_id: response.error.metadata.payment_id,
             });
             alert("Payment failed. Please try again.");
+            navigate("/orders");
         });
 
         rzp1.open();
-        navigate("/orders");
+        
     };
 
     return (
