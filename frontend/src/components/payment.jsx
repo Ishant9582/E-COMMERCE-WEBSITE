@@ -86,9 +86,6 @@ export default function Product({ totalPrice, receiptId, cart, user }) {
 
     rzp1.on("payment.failed", function (response) {
       const message = "Payment Failed";
-
-      alert(message);
-
       dispatch(placeOrder({
         items: cart.map(item => ({
           menuItem: item._id,

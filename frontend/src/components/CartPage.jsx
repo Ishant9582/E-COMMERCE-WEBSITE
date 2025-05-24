@@ -83,7 +83,7 @@ const CartPage = () => {
                       <td className="py-4 px-4">Rs {item.price}</td>
                       <td className="py-4 px-4">{item.quantity}</td>
                       <td className="py-4 px-4 text-gray-500">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        Rs {(item.price * item.quantity).toFixed(2)}
                       </td>
                     </tr>
                   ))}
